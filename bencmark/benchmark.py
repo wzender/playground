@@ -18,45 +18,49 @@ class BenchmarkRunner:
             workspace=os.getenv("COMET_WORKSPACE"),
             auto_output_logging="native",
         )
-        self.experiment.set_name(experiment_name)
+        # self.experiment.set_name(experiment_name)
         self.experiment.log_parameter("model_name", getattr(self.model, "model_name", "unknown"))
 
     def load_data(self):
-        return pd.DataFrame({
+        self.df = pd.DataFrame({
             "text": [
                 "I love this product!", "Worst service ever.", "Very happy with the support.",
                 "Not worth the money.", "Fantastic experience.", "Terrible response time."
             ],
             "label": ["positive", "negative", "positive", "negative", "positive", "negative"]
         })
+        
+    def index_to_example(self, index):
+        row = self.df.iloc[index]
+        return f"Text: '{row['text']}', True: {row['true']}, Pred: {row['pred']}"
 
     def evaluate(self):
-        df = self.load_data()
-        y_true = df["label"]
+        self.load_data()
+        y_true = self.df["label"]
         
-        df["prediction"] = df["label"].apply(self.model.predict)
-        df["success"] = df["label"] == df["prediction"]
+        self.df["prediction"] = self.df["label"].apply(self.model.predict)
+        self.df["success"] = self.df["label"] == self.df["prediction"]
 
         with tempfile.NamedTemporaryFile(mode='w', suffix='.csv', delete=False) as f:
-            df.to_csv(f.name, index=False)
-            self.experiment.log_asset(file_data=f.name, file_name="predictions.csv")
+            self.df["modle_name"] = self.experiment.name
+            self.df.to_csv(f.name, index=False)
+            self.experiment.log_asset(file_data=f.name, file_name="predictions.csv", metadata={"description": "Predictions and labels"})
             
-        y_pred = df["prediction"]
-        y_true = df["label"]
+        y_pred = self.df["prediction"]
+        y_true = self.df["label"]
             
         acc = accuracy_score(y_true, y_pred)
         self.experiment.log_metric("accuracy", acc)
         
         # Get unique sorted labels for consistent ordering
-        labels = sorted(df['label'].unique().tolist() + df['prediction'].unique().tolist())
+        labels = sorted(self.df['label'].unique().tolist() + self.df['prediction'].unique().tolist())
         labels = sorted(set(labels))
 
         # Compute confusion matrix
-        cm = confusion_matrix(df['label'], df['prediction'], labels=labels)
-        self.experiment.log_confusion_matrix(matrix=cm, labels=labels)
+        cm = confusion_matrix(self.df['label'], self.df['prediction'], labels=labels)
+        self.experiment.log_confusion_matrix(matrix=cm, labels=labels, index_to_example_function=self.index_to_example)
         
-        
-        for i, (text, true, pred, success) in enumerate(zip(df["text"], df["label"], df["prediction"], df["success"])):
+        for i, (text, true, pred, success) in enumerate(zip(self.df["text"], self.df["label"], self.df["prediction"], self.df["success"])):
             self.experiment.log_text(
                 f"Example {i}",
                 f"Text: {text} | True: {true} | Pred: {pred} | Success: {success}"
