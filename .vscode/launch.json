@@ -1,0 +1,37 @@
+{
+    // Configurations for debugging Python applications
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: Current File",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            }
+        },
+        {
+            "name": "fastapi_greet_logger",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}/fastapi_greet_logger"
+            }
+        },
+        {
+            "name": "main fastapi_greet_logger",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "fastapi_greet_logger/main.py",
+            "console": "integratedTerminal",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}/fastapi_greet_logger"
+            }
+        }
+
+    ]
+}
