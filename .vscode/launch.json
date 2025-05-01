@@ -13,25 +13,14 @@
             }
         },
         {
-            "name": "fastapi_greet_logger",
-            "type": "debugpy",
-            "request": "launch",
-            "program": "${file}",
-            "console": "integratedTerminal",
-            "env": {
-                "PYTHONPATH": "${workspaceFolder}/fastapi_greet_logger"
-            }
-        },
-        {
             "name": "main fastapi_greet_logger",
             "type": "debugpy",
             "request": "launch",
-            "program": "fastapi_greet_logger/main.py",
+            "program": "main.py",
             "console": "integratedTerminal",
             "env": {
-                "PYTHONPATH": "${workspaceFolder}/fastapi_greet_logger"
+                "PYTHONPATH": "${workspaceFolder}"
             }
         }
-
     ]
 }

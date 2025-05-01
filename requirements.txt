@@ -1,0 +1,7 @@
+fastapi
+uvicorn
+colorlog
+httpx
+comet_ml
+pandas
+scikit-learn
